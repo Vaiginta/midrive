@@ -48,14 +48,21 @@ class App extends Component {
     
     let filterData = (data, filters, index) => {
       var filteredData;
-      filteredData = filters.length !== 0 ? data.filter(d => d[filters[index].filterType] === filters[index].filterName) : data;
-      index += 1;
-      if (index >= filters.length) {
-        return filteredData;  
+      if (filters.length === 0) {
+        return data
       } else {
-        return filterData(filteredData, filters, index); 
+        filteredData = data.filter(d => d[filters[index].filterType] === filters[index].filterName);
+        index += 1;
+        if (index >= filters.length) {
+          return filteredData;  
+        } else {
+          return filterData(filteredData, filters, index); 
+        }
       }
+      
     }
+
+    let filteredData = filterData(data, filters, 0);
 
     return (
       <div className='app-root'>
@@ -71,7 +78,7 @@ class App extends Component {
                         <br />
                         {key !== 'route' && <select onChange={e => this.setFilter(key, e)}>
                           <option></option>
-                          { finUniqueValues(data.map(d => d[key])).map(opt => <option>{opt}</option>) }
+                          { finUniqueValues(filteredData.map(d => d[key])).map(opt => <option>{opt}</option>) }
                         </select>}
                       </th>
                     );
@@ -80,7 +87,7 @@ class App extends Component {
               </thead>
             </table>
             <tbody>        
-              { filterData(data, filters, 0).map((d, i) => {
+              { filteredData.map((d, i) => {
                   return (
                     <tr key={i}>
                       { keys.map((key, j) => {
